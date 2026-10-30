@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商务休闲西裤 · AI 图片指令生成器</title>
+<style>
+  :root{
+    --orange:#fb7701;
+    --orange-deep:#d95f00;
+    --orange-soft:#fff3e8;
+    --bg:#f4f5f7;
+    --card:#ffffff;
+    --ink:#1d1d1f;
+    --ink-2:#4a4a52;
+    --muted:#8a8a93;
+    --line:#e9e9ef;
+    --dark:#1c1c1e;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:14px;line-height:1.6;
+  }
+  .wrap{max-width:1440px;margin:0 auto;padding:20px 20px 60px}
+
+  /* ===== 顶部标题条 ===== */
+  .topbar{
+    background:var(--card);border-radius:var(--radius);padding:20px 24px;
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+  }
+  .topbar .left{display:flex;align-items:center;gap:14px;min-width:0}
+  .mark{
+    width:6px;height:44px;border-radius:3px;flex:0 0 auto;
+    background:linear-gradient(180deg,var(--orange),#ffb066);
+  }
+  .topbar h1{font-size:21px;margin:0;letter-spacing:.3px;font-weight:700}
+  .topbar p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+  .topbar .badges{display:flex;gap:8px;flex-wrap:wrap}
+  .badge{
+    font-size:12px;padding:5px 11px;border-radius:999px;background:var(--orange-soft);
+    color:var(--orange-deep);border:1px solid #ffdcc2;white-space:nowrap;
+  }
+
+  /* ===== 使用原则 ===== */
+  .principles{
+    margin-top:14px;background:var(--orange-soft);border-left:4px solid var(--orange);
+    border-radius:10px;padding:13px 18px;
+  }
+  .principles b{color:var(--orange-deep);font-size:13px;letter-spacing:.5px}
+  .principles ul{margin:6px 0 0;padding-left:18px;color:var(--ink-2);font-size:13px}
+  .principles li{margin:2px 0}
+  .principles li em{font-style:normal;color:var(--orange-deep);font-weight:600}
+
+  /* ===== 主布局 ===== */
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:16px;margin-top:16px;align-items:start}
+  @media (max-width:1180px){
+    .layout{grid-template-columns:1fr}
+    .sticky{position:static !important}
+  }
+
+  /* ===== 模块卡片 ===== */
+  .module{
+    background:var(--card);border-radius:var(--radius);padding:18px 20px 16px;margin-bottom:14px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+  }
+  .module-head{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .num{
+    width:26px;height:26px;border-radius:9px;background:var(--orange);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:0 0 auto;
+  }
+  .module-head h2{font-size:15.5px;margin:0;font-weight:700}
+  .module-head .tip{color:var(--muted);font-size:12px;margin-left:2px}
+
+  /* 分模块预设条 */
+  .presetbar{
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+    margin:10px 0 4px;padding:7px 9px;background:#fafafb;border:1px solid var(--line);border-radius:10px;
+  }
+  .presetbar .lb{font-size:12px;color:var(--muted);margin-right:2px}
+  .presetbar input{
+    flex:1 1 110px;min-width:90px;border:1px solid var(--line);border-radius:7px;
+    padding:5px 8px;font-size:12px;font-family:inherit;color:var(--ink);background:#fff;outline:none;
+  }
+  .presetbar input:focus{border-color:var(--orange)}
+  .presetbar select{
+    flex:1 1 110px;min-width:90px;border:1px solid var(--line);border-radius:7px;
+    padding:5px 6px;font-size:12px;font-family:inherit;background:#fff;color:var(--ink);outline:none;
+  }
+  .btn{
+    border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 10px;
+    font-size:12px;font-family:inherit;color:var(--ink-2);cursor:pointer;transition:.15s;
+  }
+  .btn:hover{border-color:var(--orange);color:var(--orange-deep);background:var(--orange-soft)}
+  .btn.primary{background:var(--orange);border-color:var(--orange);color:#fff}
+  .btn.primary:hover{background:var(--orange-deep);border-color:var(--orange-deep);color:#fff}
+
+  /* 电商用 */
+  .group{margin-top:14px}
+  .group-label{font-size:12.5px;color:var(--ink-2);font-weight:600;margin-bottom:7px;display:flex;gap:6px;align-items:center}
+  .group-label span.tag{
+    font-weight:400;font-size:11px;color:var(--muted);border:1px solid var(--line);
+    border-radius:5px;padding:0 5px;line-height:16px;
+  }
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{
+    border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 11px;
+    font-size:12.5px;color:var(--ink-2);cursor:pointer;transition:.15s;user-select:none;
+  }
+  .chip:hover{border-color:#ffc79b;background:#fffaf6}
+  .chip.on{background:var(--orange-soft);border-color:var(--orange);color:var(--orange-deep);font-weight:600}
+  .chip.on::before{content:"✓ ";font-size:11px}
+
+  /* 可选区块（已提供产品图时不选） */
+  .optbox{
+    margin-top:16px;border:1.5px dashed var(--orange);border-radius:12px;
+    background:#fffdfa;padding:12px 14px 4px;
+  }
+  .optbox .opt-head{display:flex;align-items:flex-start;gap:8px;margin-bottom:2px}
+  .optbox .opt-head .ico{
+    flex:0 0 auto;width:18px;height:18px;border-radius:50%;background:var(--orange);
+    color:#fff;font-size:12px;line-height:18px;text-align:center;font-weight:700;margin-top:1px;
+  }
+  .optbox .opt-head b{font-size:12.8px;color:var(--orange-deep);display:block}
+  .optbox .opt-head p{margin:0;font-size:12px;color:var(--ink-2)}
+  .optbox .group{margin-top:11px}
+
+  /* 高点击配方 */
+  .recipes{background:var(--card);border-radius:var(--radius);padding:16px 20px 18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .recipes h2{font-size:15px;margin:0 0 2px}
+  .recipes .sub{font-size:12px;color:var(--muted);margin-bottom:12px}
+  .rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:9px}
+  .rc{border:1px solid var(--line);border-radius:10px;padding:9px 11px;cursor:pointer;transition:.15s;background:#fff}
+  .rc:hover{border-color:var(--orange);background:var(--orange-soft)}
+  .rc b{display:block;font-size:12.8px;margin-bottom:2px}
+  .rc .meta{font-size:11.5px;color:var(--muted);line-height:1.5}
+  .rc .bd{display:inline-block;font-size:10.5px;padding:0 6px;border-radius:4px;background:#fff3e8;color:var(--orange-deep);border:1px solid #ffdcc2;margin-left:4px}
+
+  /* ===== 右侧结果区 ===== */
+  .sticky{position:sticky;top:16px}
+  .panel{
+    background:var(--card);border-radius:var(--radius);padding:18px 18px 16px;
+    box-shadow:0 1px 2px rgba(0,0,0,.05);
+  }
+  .panel h3{font-size:14.5px;margin:0 0 10px;display:flex;align-items:center;justify-content:space-between}
+  .panel h3 .cnt{font-size:11.5px;color:var(--muted);font-weight:400}
+  .promptbox{
+    background:var(--dark);border-radius:11px;padding:13px 14px;color:#f2f2f5;
+    font-size:12.8px;line-height:1.75;max-height:330px;overflow:auto;white-space:pre-wrap;
+    word-break:break-word;font-family:"SFMono-Regular",Consolas,"PingFang SC",monospace;
+  }
+  .promptbox .sep{color:#fb7701;font-weight:700;display:block;margin:10px 0 6px;letter-spacing:1px}
+  .promptbox::-webkit-scrollbar{width:7px}
+  .promptbox::-webkit-scrollbar-thumb{background:#48484d;border-radius:4px}
+  .promptbox .ph{color:#7d7d85}
+  .tagline{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .tagline .t{
+    font-size:11.5px;background:#f6f6f8;border:1px solid var(--line);color:var(--ink-2);
+    border-radius:6px;padding:2px 8px;
+  }
+  .actions{display:flex;gap:8px;margin-top:12px}
+  .actions .btn{flex:1;text-align:center;padding:8px 10px;font-size:13px;border-radius:9px}
+  .actions .btn.copy{flex:2}
+
+  .points{margin-top:14px;background:var(--card);border-radius:var(--radius);padding:16px 18px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+  .points h3{font-size:14px;margin:0 0 10px}
+  .pcard{border-left:3px solid var(--orange);background:#fbfbfc;border-radius:8px;padding:9px 12px;margin-bottom:9px}
+  .pcard b{font-size:12.5px;color:var(--ink);display:block;margin-bottom:3px}
+  .pcard ul{margin:0;padding-left:16px;font-size:12.3px;color:var(--ink-2)}
+  .pcard li{margin:2px 0}
+  .pcard.warn{border-left-color:#e0453a}
+  .pcard.ok{border-left-color:#2ba471}
+
+  /* ===== 底部：关键词云 & 平台策略 ===== */
+  .bottom{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+  @media (max-width:900px){.bottom{grid-template-columns:1fr}}
+  .sec{background:var(--card);border-radius:var(--radius);padding:18px 20px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .sec h3{font-size:15px;margin:0 0 4px}
+  .sec .sub{font-size:12px;color:var(--muted);margin-bottom:12px}
+  .kwgroup{margin-bottom:12px}
+  .kwgroup .k{font-size:12px;color:var(--orange-deep);font-weight:600;margin-bottom:6px}
+  .kw{display:flex;flex-wrap:wrap;gap:6px}
+  .kw .w{
+    font-size:12px;padding:3px 9px;border-radius:999px;background:#f6f6f8;
+    border:1px solid var(--line);color:var(--ink-2);cursor:pointer;transition:.15s;
+  }
+  .kw .w:hover{background:var(--orange-soft);border-color:#ffc79b;color:var(--orange-deep)}
+  .kw .w.on{background:var(--orange);border-color:var(--orange);color:#fff}
+
+  .strategy{display:grid;gap:10px}
+  .st-item{border:1px solid var(--line);border-radius:10px;padding:10px 13px}
+  .st-item b{display:block;font-size:12.8px;margin-bottom:3px}
+  .st-item p{margin:0;font-size:12.3px;color:var(--ink-2)}
+  .st-item .why{color:var(--muted);font-size:11.8px;margin-top:3px}
+
+  .disclaimer{
+    margin-top:18px;background:#fbfbfc;border:1px solid var(--line);border-radius:12px;
+    padding:14px 20px;text-align:center;color:#8a8a93;font-size:12.5px;line-height:2;
+  }
+  .disclaimer p{margin:0}
+  .disclaimer .dk{color:#b0b0b8;font-size:11.5px;letter-spacing:2px;margin-bottom:6px}
+
+  /* 标准表 */
+  .stdtable{width:100%;border-collapse:collapse;font-size:12.3px}
+  .stdtable th,.stdtable td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;color:var(--ink-2)}
+  .stdtable th{background:#f7f7f9;font-weight:600;color:var(--ink);font-size:12px}
+  .stdtable td b{color:var(--ink)}
+  .stdtable tr:nth-child(even) td{background:#fcfcfd}
+  .stdtable td:nth-child(4){color:#9a5a52}
+
+  .foot{text-align:center;color:#b0b0b8;font-size:12px;margin-top:26px}
+  .toast{
+    position:fixed;left:50%;bottom:36px;transform:translate(-50%,14px);
+    background:#1c1c1e;color:#fff;font-size:13px;padding:9px 18px;border-radius:10px;
+    opacity:0;pointer-events:none;transition:.25s;z-index:99;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="left">
+      <div class="mark"></div>
+      <div>
+        <h1>商务休闲西裤 · 图片 AI 指令生成器</h1>
+        <p>Business Casual Trousers · Prompt Center　|　左侧选要素，右侧一键复制成品指令</p>
+      </div>
+    </div>
+    <div class="badges">
+      <span class="badge">图生图 · 先传产品图</span>
+      <span class="badge">单张整幅主图</span>
+      <span class="badge">一动作一指令</span>
+      <span class="badge">裤装占画面 60%+</span>
+    </div>
+  </div>
+
+  <div class="principles">
+    <b>使用原则</b>
+    <ul>
+      <li>用法是<em>图生图</em>：先上传你的长裤产品图，再复制指令改图。指令固定以「将我提供的这条长裤（参考图）按照以下指令，生成一张商业服装摄影」开头。</li>
+      <li>只出<em>单张整幅动作主图</em>：一位模特、一个动作、一个场景，满幅构图；不做左右分栏、细节框、编号框、拼图分格。</li>
+      <li>动作勾选多个时，输出<em>多段互相独立的指令</em>，每段对应一张图，不要把多个动作合成一张组图。</li>
+      <li>①中的<em>版型/颜色/面料/细节不选也行</em>：留空即要求"严格按产品图 1:1 保留"，只有想改造时才勾。</li>
+      <li>裤装是主角：<em>腰头、口袋、裤线与裤脚</em>必须完整入镜，裁切不得截断设计点。</li>
+      <li>顶部有<em>高点击配方</em>：点一下即填好基调/光影/场景/动作/情绪，来自长裤品类命中款结构，再按需微调。</li>
+      <li>④里可切换<em>拍摄形式</em>：真人动作主图，或静物平铺/挂拍/模台/多色陈列（静物会自动去掉模特与场景描述）。</li>
+      <li>标注默认关闭（纯主图）；需要讲面料/版型时才开小字或 ICON，且不压产品。</li>
+    </ul>
+  </div>
+
+  <div class="layout">
+    <!-- 左：高点击配方 + ①②③④ 模块 -->
+    <div>
+      <div class="recipes" id="recipes"></div>
+      <div id="modules"></div>
+    </div>
+
+    <!-- 右：吸顶结果区 -->
+    <div class="sticky">
+      <div class="panel">
+        <h3>生成指令 <span class="cnt" id="charCount">0 字</span></h3>
+        <div class="promptbox" id="promptBox"><span class="ph">在左侧选择款式、场景、动作与视觉语言，指令将自动生成…</span></div>
+        <div class="tagline" id="tagline"></div>
+        <div class="actions">
+          <button class="btn copy primary" id="copyBtn">复制全部指令</button>
+          <button class="btn" id="resetBtn">重置</button>
+        </div>
+      </div>
+
+      <div class="points">
+        <h3>要点卡片</h3>
+        <div class="pcard ok">
+          <b>商务休闲的关键识别点</b>
+          <ul>
+            <li>裤线笔挺 + 面料有垂坠或挺括感，不是软塌运动卫裤</li>
+            <li>上身"半正式"：衬衫/针织 polo/西装外套，配德比鞋或乐福鞋</li>
+            <li>场景偏城市与室内：街道、大堂、咖啡馆、极简棚拍</li>
+          </ul>
+        </div>
+        <div class="pcard warn">
+          <b>常犯错误（务必避免）</b>
+          <ul>
+            <li>裤脚被裁、腰头被外套完全遮住 → 版型卖点看不见</li>
+            <li>背景杂乱抢戏、道具过多，注意力跑出裤型</li>
+            <li>极简棚拍却穿运动鞋 + 亮色堆叠，风格对不上</li>
+            <li>一张图塞入多个动作或多视角 → 变成拼图</li>
+          </ul>
+        </div>
+        <div class="pcard">
+          <b>出图前自查</b>
+          <ul>
+            <li>裤装是否占画面 60% 以上？</li>
+            <li>腰头/口袋/裤线/裤脚是否完整？</li>
+            <li>光影是否统一为一种基调（不要冷暖混搭）？</li>
+            <li>比例是否与投放位一致（竖版 3:4 为主）？</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部：标准表 + 共性/跑法 + 关键词云 + 平台视觉策略 -->
+  <div class="sec" style="margin-top:16px">
+    <h3>高点击方向定版 · 5 维度标准表</h3>
+    <div class="sub">长裤品类的判定口径：达标长什么样、不达标是什么样、落点怎么执行</div>
+    <table class="stdtable">
+      <thead>
+        <tr><th style="width:110px">维度</th><th style="width:180px">标准定义</th><th>达标描述</th><th>反面示例（不达标）</th><th style="width:200px">可执行落点</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><b>1. 视觉基调</b></td><td>以裤型为核心的风格化男裤</td><td>明确风格标签（机能/高级/度假/舞台/街头），裤装为主要记忆点</td><td>无风格、平铺直叙、裤型不突出</td><td>锁定一个强风格（机能/垂坠高级/度假/舞台），裤为主角</td></tr>
+        <tr><td><b>2. 构图框型</b></td><td>下半身特写或全身，裤装占比高</td><td>腰至脚踝或全身竖构图，裤装占主体，留白少</td><td>主体偏小、裤腿被裁、留白过多</td><td>下半身特写/全身，裤装占 60%+，裁切不截断裤脚设计点</td></tr>
+        <tr><td><b>3. 场景</b></td><td>场景化叙事讲"适合场合"</td><td>户外机能/雪山/马术/度假庭院海边/舞台，背景干净聚焦</td><td>背景杂乱与裤抢戏、无场景语境</td><td>选 1 个场景语境（机能/度假/舞台），背景简洁</td></tr>
+        <tr><td><b>4. 搭配妆发</b></td><td>强化裤型的穿搭</td><td>利落上装或露腹，墨镜/白T克制点缀，突出裤型</td><td>搭配杂乱抢裤、妆发夸张</td><td>白T+外套等利落上装，靠身材与裤型带动</td></tr>
+        <tr><td><b>5. 情绪动作</b></td><td>松弛自信 / 动态张力</td><td>动态抓拍或松弛自信站姿，表情克制有型</td><td>表情夸张、动作僵硬无张力</td><td>动态抓拍或松弛站姿，用场景动作带出"适合场合"</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="bottom">
+    <div class="sec">
+      <h3>高点击共性 & 两套拍摄跑法</h3>
+      <div class="sub">这一组男裤（阔腿/工装/运动/西裤）的命中规律，可直接复用到商务休闲西裤</div>
+      <div class="strategy">
+        <div class="st-item">
+          <b>以"下半身 + 裤型"为核心卖点</b>
+          <p>几乎全部采用下半身特写或全身构图，把垂坠、宽松、多袋、版型放大呈现。</p>
+        </div>
+        <div class="st-item">
+          <b>真人上身 + 静物局部组合</b>
+          <p>人像（全身站、镜前自拍、侧身）体现"穿上身的样子和垂感"，静物局部（腿部特写、平铺）展示裤型细节，两者组合最完整。</p>
+        </div>
+        <div class="st-item">
+          <b>场景化讲"适合什么场合"</b>
+          <p>用场景叙事替代参数罗列：通勤、机能、度假、舞台各有语境，一图只讲一个场合。</p>
+        </div>
+        <div class="st-item">
+          <b>每款都要有一个记忆点</b>
+          <p>格子口袋贴布、红色车线内标、五袋水洗、D字工装袋、压褶裤线——不靠裸版型硬撑。</p>
+        </div>
+        <div class="st-item">
+          <b>光线干净、腰头口袋裤脚拍全</b>
+          <p>自然光/棚拍柔光为主，影子轻，裤型和垂坠感看得清；裁切不截断设计点。</p>
+        </div>
+        <div class="st-item">
+          <b>多色陈列是最适合裤装的静物形式</b>
+          <p>叠放/平铺/并排把 2-4 个颜色摆在一起，把"多色可选、洗水不同"一次讲清。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h3>关键词补充云</h3>
+      <div class="sub">点击补充到指令末尾，作为画面质感与细节的加分项（可多选）</div>
+      <div id="keywords"></div>
+    </div>
+  </div>
+
+  <div class="bottom" style="margin-top:16px">
+    <div class="sec" style="grid-column:1/-1">
+      <h3>平台视觉策略说明</h3>
+      <div class="sub">面向电商主图/场景图的投放逻辑，决定"哪张图讲什么"</div>
+      <div class="strategy">
+        <div class="st-item">
+          <b>首图：白底或浅灰底纯产品</b>
+          <p>正面平铺或人台全身，裤线、腰部结构与裤脚长度一眼可读，背景留白 15%-20%。</p>
+          <div class="why">首图比的是"能在货架里被认出"，不承担风格叙事。</div>
+        </div>
+        <div class="st-item">
+          <b>第 2-3 图：场景主图讲场合</b>
+          <p>用本页生成的商务通勤场景图：城市街道、办公大堂、咖啡馆，人物全身竖构图。</p>
+          <div class="why">商务休闲的核心是"能穿去哪"，场景比参数更能促成决策。</div>
+        </div>
+        <div class="st-item">
+          <b>第 4 图起：版型与面料特写</b>
+          <p>腰至脚踝的下半身特写，突出垂坠、免烫挺括、微弹舒适与压褶裤线。</p>
+          <div class="why">卖点要落在可验证的视觉证据上，不靠文字标注堆叠。</div>
+        </div>
+        <div class="st-item">
+          <b>多色 SKU 用多色陈列图</b>
+          <p>同款多色并排/叠放平铺，腰头齐平露出，讲清可选色与洗水差异。</p>
+          <div class="why">一条陈列图替代多张单色图，降低决策成本。</div>
+        </div>
+        <div class="st-item">
+          <b>版式与比例</b>
+          <p>主投竖版 3:4 / 4:5，移动端首屏友好；1:1 用于货架、静物陈列与站内推荐位。</p>
+          <div class="why">竖版全身构图在移动端可保留完整裤型，不被迫裁切。</div>
+        </div>
+        <div class="st-item">
+          <b>文字与标注克制</b>
+          <p>默认零标注；必要时右下角一行小字（≤8 字）或单一 ICON，透明度低、不压产品。</p>
+          <div class="why">标注过度会让主图变海报，降低货架识别度与合规性。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">商务休闲西裤 · AI 图片指令生成器　|　所有参数在本地保存，刷新不丢失</div>
+
+  <div class="disclaimer">
+    <div class="dk">免 责 声 明</div>
+    <p>【本文分享的内容（包括但不限于示例、图片、文字等）仅供参考，不构成任何法律意见或建议】</p>
+    <p>【跨境电商是长期生意，希望和商家一起通过良性的经营，打造好的购物体验，更好地服务用户】</p>
+  </div>
+</div>
+
+<div class="toast" id="toast">已复制</div>
+
+<script>
+/* =========================================================
+   数据配置
+   ========================================================= */
+const MODULES = [
+  {
+    id: "m1", no: "①", title: "搭配与款式", tip: "先定穿搭，款式参数可不填",
+    groups: [
+      { id:"top", label:"上身搭配", type:"single", opts:["白色精梳衬衫扎进裤腰","浅灰针织 POLO","短袖衬衫外搭白 T","西装外套 + 白 T","亚麻衬衫（半扎）","深色高领打底"] },
+      { id:"shoe", label:"鞋履配件（多选）", type:"multi", opts:["黑色德比鞋","棕色乐福鞋","白色低帮板鞋","同色皮质腰带","细框眼镜","极简腕表","皮质托特包"] },
+      { id:"fit", opt:true, label:"版型", type:"single", opts:["直筒商务西裤","微阔腿垂坠裤","上宽下收锥形裤","高腰压褶西裤","九分微锥通勤裤"] },
+      { id:"color", opt:true, label:"颜色", type:"single", opts:["中灰色","藏青色","米白色","卡其色","深咖色","浅燕麦色"] },
+      { id:"fabric", opt:true, label:"面料质感", type:"single", opts:["精纺羊毛混纺（垂坠挺括）","免烫聚酯混纺（干爽挺括）","弹力棉混纺（微弹舒适）","亚麻混纺（夏日透气）","细斜纹西装料（哑光高级）"] },
+      { id:"detail", opt:true, label:"细节工艺（多选）", type:"multi", opts:["永久压褶裤线","无褶平腰","腰部侧调节扣","隐形后袋","翻边裤脚","暗门襟","腰内抽绳（轻商务）","裤线定型烫压"] }
+    ]
+  },
+  {
+    id: "m2", no: "②", title: "场景 · 动作 · 情绪", tip: "决定这张图讲什么场合",
+    groups: [
+      { id:"scene", label:"场景", type:"single", opts:["城市街道玻璃幕墙","办公楼大堂与旋转门","咖啡馆外摆木桌","极简灰白棚拍","白色纯色棚拍","灰色水泥墙棚拍","酒店廊道与廊柱","庭院石墙与绿植","地铁站台通道","浅色木地板室内","镜前酒柜与客厅","海边露台白栏杆"] },
+      { id:"action", label:"动作（多选＝多张图）", type:"multi", opts:["行走跨步抓拍","站立双手插兜","单手插兜站立","侧身回望","抬手整理袖口","倚靠玻璃幕墙","台阶上自然坐姿","手拎外套搭肩","镜前自拍站姿","手拉裤腿展示","手插兜露腰"] },
+      { id:"mood", label:"情绪", type:"single", opts:["松弛自信","克制专业","冷峻高级","亲和商务","利落干练"] },
+      { id:"frame", label:"景别构图", type:"single", opts:["全身竖构图居中","腰至脚踝下半身特写","侧身全身微侧","半身近景偏下"] }
+    ]
+  },
+  {
+    id: "m3", no: "③", title: "视觉语言", tip: "决定画面的调性与光",
+    groups: [
+      { id:"tone", label:"视觉基调", type:"single", opts:["韩系极简都市通勤","极简高级冷调","日系通勤干净","都市机能商务","复古英伦绅士","夏日轻商务"] },
+      { id:"light", label:"光影", type:"single", opts:["柔光前侧、暖调低反差","明亮正面柔光、低反差","硬光侧逆、冷调高反差","硬光侧逆、冷绿高反差","阴天漫射柔光","自然直射硬光、影子重","明亮自然光、蓝天底","室内暖光偏暗但均匀","柔和棚拍/室内光","柔和均匀白底、阴影轻","傍晚暖调侧光","棚拍均匀柔光"] },
+      { id:"lens", label:"镜头质感", type:"single", opts:["50mm 人像镜头、自然透视","85mm 长焦压缩、背景干净","35mm 环境人像、带场景呼吸感","胶片颗粒、低饱和高级感"] },
+      { id:"bg", label:"背景处理", type:"single", opts:["纯白背景","浅灰纯色背景","米白纯色背景","灰色水泥地面","背景干净不抢、聚焦裤型","背景轻微虚化","强虚化突出裤型","纯色极简背景"] },
+      { id:"view", label:"机位视角", type:"single", opts:["正面平视","侧面平视","微侧 45°","略低机位拉长腿型"] }
+    ]
+  },
+  {
+    id: "m4", no: "④", title: "拍摄形式与输出", tip: "人像动作图 / 静物陈列图",
+    groups: [
+      { id:"form", label:"拍摄形式", type:"single", opts:["真人动作主图（默认）","静物平铺","挂拍 / 衣架悬挂","半身模台 / 假人展示","多色叠放陈列"] },
+      { id:"ratio", label:"画面比例", type:"single", opts:["3:4 竖版（主投）","4:5 竖版","1:1 方图","9:16 全屏竖版","16:9 横版"] },
+      { id:"quality", label:"画质等级", type:"single", opts:["商业精修级、高清细节","电商主图级、清晰干净","杂志质感、高级胶片色"] },
+      { id:"label", label:"标注方式", type:"single", opts:["不标注、纯主图","右下角小字标注面料卖点","极简 ICON 标注版型卖点"] }
+    ]
+  }
+];
+
+const KEYWORD_GROUPS = [
+  { k:"裤型语言", words:["笔直裤线","垂坠不贴身","裤腰平整","裤脚无堆积","比例修长","胯部利落不扯褶"] },
+  { k:"面料质感", words:["哑光高级","细密斜纹","免烫挺括","微弹活动自如","轻薄透气","不易起皱"] },
+  { k:"搭配气质", words:["半正式通勤","干净黑白灰","同色系层次","腰带点缀","袜子与鞋同色系"] },
+  { k:"画面质感", words:["浅景深","自然肤色","布料纹理清晰","无过度磨皮","真实裤褶","通透高光"] },
+  { k:"静物陈列", words:["平铺舒展","腰头齐平露出","多色并排","绒里翻开展示","布料纹理清晰","无褶皱堆叠","纯白底干净"] },
+  { k:"规避项", words:["不要运动卫裤感","不要软塌贴腿","不要背景杂乱","不要拼图多视角","不要夸张表情","不要裤脚被裁"] }
+];
+
+const NEGATIVE = "拼图分格、多画面并列、左侧分栏、细节展示框、编号角标、信息图版式、文字乱码、贴纸堆叠、裤脚被裁切、腰头被完全遮挡、夸张表情、过度磨皮、背景路人杂乱、廉价反光面料";
+
+/* 高点击配方：取自长裤品类集合页的命中款结构（基调/光影/场景/动作/情绪/构图） */
+const RECIPES = [
+  {
+    name:"韩系极简通勤", badge:"90+",
+    note:"镜前自拍 + 暖调柔光，松弛精致",
+    values:{ form:["真人动作主图（默认）"], tone:["韩系极简都市通勤"], light:["柔光前侧、暖调低反差"],
+      scene:["镜前酒柜与客厅"], action:["镜前自拍站姿"], mood:["松弛自信"], frame:["全身竖构图居中"],
+      bg:["背景干净不抢、聚焦裤型"], view:["正面平视"] }
+  },
+  {
+    name:"都市机能商务", badge:"95+",
+    note:"街道露腰站姿，明亮柔光讲利落",
+    values:{ form:["真人动作主图（默认）"], tone:["都市机能商务"], light:["明亮正面柔光、低反差"],
+      scene:["城市街道玻璃幕墙"], action:["手插兜露腰"], mood:["利落干练"], frame:["腰至脚踝下半身特写"],
+      bg:["背景轻微虚化"], view:["正面平视"] }
+  },
+  {
+    name:"极简高级冷调", badge:"95+",
+    note:"纯色棚拍，冷白低反差，腰臀以下",
+    values:{ form:["真人动作主图（默认）"], tone:["极简高级冷调"], light:["棚拍均匀柔光"],
+      scene:["极简灰白棚拍"], action:["单手插兜站立"], mood:["冷峻高级"], frame:["腰至脚踝下半身特写"],
+      bg:["纯色极简背景"], view:["微侧 45°"] }
+  },
+  {
+    name:"都市休闲灰调", badge:"90+",
+    note:"灰水泥墙 + 细条纹阔腿，克制高级",
+    values:{ form:["真人动作主图（默认）"], tone:["极简高级冷调"], light:["柔和棚拍/室内光"],
+      scene:["灰色水泥墙棚拍"], action:["单手插兜站立"], mood:["克制专业"], frame:["全身竖构图居中"],
+      bg:["背景干净不抢、聚焦裤型"], view:["正面平视"] }
+  },
+  {
+    name:"日系通勤明亮", badge:"90+",
+    note:"白天街道，干净低反差，裤型主角",
+    values:{ form:["真人动作主图（默认）"], tone:["日系通勤干净"], light:["明亮自然光、蓝天底"],
+      scene:["城市街道玻璃幕墙"], action:["行走跨步抓拍"], mood:["亲和商务"], frame:["全身竖构图居中"],
+      bg:["背景轻微虚化"], view:["略低机位拉长腿型"] }
+  },
+  {
+    name:"静物多色陈列", badge:"静物",
+    note:"多色并排/叠放，讲清可选色与洗水",
+    values:{ form:["多色叠放陈列"], light:["柔和均匀白底、阴影轻"], bg:["纯白背景"],
+      ratio:["1:1 方图"], quality:["电商主图级、清晰干净"], label:["不标注、纯主图"] }
+  },
+  {
+    name:"静物平铺单品", badge:"静物",
+    note:"纯白/浅灰底居中平铺，腰头口袋全露",
+    values:{ form:["静物平铺"], light:["柔和均匀白底、阴影轻"], bg:["纯白背景"],
+      ratio:["1:1 方图"], quality:["电商主图级、清晰干净"], label:["不标注、纯主图"] }
+  }
+];
+
+/* =========================================================
+   状态
+   ========================================================= */
+const STORE_KEY = "biz_casual_trouser_prompt_v1";
+let state = {};
+MODULES.forEach(m => m.groups.forEach(g => { state[g.id] = []; }));
+// 默认值：比例与画质给主投规格，标注默认关闭
+state["ratio"] = ["3:4 竖版（主投）"];
+state["quality"] = ["电商主图级、清晰干净"];
+state["label"] = ["不标注、纯主图"];
+state["form"] = ["真人动作主图（默认）"];
+let kwState = [];
+let presets = loadPresets();
+
+function loadPresets(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(!raw) return {};
+    const o = JSON.parse(raw);
+    return o && typeof o === "object" ? o : {};
+  }catch(e){ return {}; }
+}
+function savePresets(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(presets)); }catch(e){}
+}
+
+/* =========================================================
+   渲染左侧模块
+   ========================================================= */
+/* =========================================================
+   高点击配方
+   ========================================================= */
+function renderRecipes(){
+  const host = document.getElementById("recipes");
+  host.innerHTML = `
+    <h2>高点击配方 · 一键套用</h2>
+    <div class="sub">来自长裤品类集合页的命中款结构（基调／光影／场景／动作／情绪／构图），点一下即填满左侧模块，再按需微调</div>
+    <div class="rgrid">
+      ${RECIPES.map((r,i) => `
+        <div class="rc" data-i="${i}">
+          <b>${r.name}<span class="bd">${r.badge}</span></b>
+          <div class="meta">${r.note}</div>
+        </div>
+      `).join("")}
+    </div>`;
+
+  host.querySelectorAll(".rc").forEach(el => {
+    el.addEventListener("click", () => applyRecipe(RECIPES[+el.dataset.i]));
+  });
+}
+
+function applyRecipe(r){
+  // 先清空所有非"可选"组，避免上一个配方的参数残留
+  MODULES.forEach(m => m.groups.forEach(g => {
+    if(!g.opt) state[g.id] = [];
+  }));
+  // 输出规格回到默认，再由配方覆盖
+  state["form"] = ["真人动作主图（默认）"];
+  state["ratio"] = ["3:4 竖版（主投）"];
+  state["quality"] = ["电商主图级、清晰干净"];
+  state["label"] = ["不标注、纯主图"];
+
+  Object.keys(r.values).forEach(gid => {
+    state[gid] = r.values[gid].slice();
+  });
+
+  MODULES.forEach(m => m.groups.forEach(g => {
+    const gEl = document.querySelector('.group[data-g="' + g.id + '"]');
+    if(gEl) syncChips(g.id, gEl);
+  }));
+  generate();
+  toast("已套用配方：" + r.name);
+}
+
+function groupHTML(g){
+  return `
+    <div class="group" data-g="${g.id}">
+      <div class="group-label">${g.label}<span class="tag">${g.type === "multi" ? "可多选" : "单选"}</span>${g.opt ? '<span class="tag">可不选</span>' : ""}</div>
+      <div class="chips">
+        ${g.opts.map(o => `<div class="chip" data-v="${o}">${o}</div>`).join("")}
+      </div>
+    </div>`;
+}
+
+function renderModules(){
+  const host = document.getElementById("modules");
+  host.innerHTML = MODULES.map(m => `
+    <div class="module" data-mod="${m.id}">
+      <div class="module-head">
+        <div class="num">${m.no}</div>
+        <h2>${m.title}</h2>
+        <div class="tip">${m.tip}</div>
+      </div>
+
+      <div class="presetbar">
+        <span class="lb">预设</span>
+        <input type="text" class="pname" placeholder="命名后保存，如：通勤主图A">
+        <button class="btn p-save">保存</button>
+        <select class="p-list"></select>
+        <button class="btn p-load">加载</button>
+        <button class="btn p-del">删除</button>
+      </div>
+
+      ${m.groups.filter(g => !g.opt).map(g => groupHTML(g)).join("")}
+      ${m.groups.some(g => g.opt) ? `
+        <div class="optbox">
+          <div class="opt-head">
+            <div class="ico">i</div>
+            <div>
+              <b>这部分可以不选</b>
+              <p>你已经提供品牌长裤产品图时，版型/颜色/面料/细节留空即可，指令会自动要求"严格按产品图保留原样"；只有想改造或换色时才勾选。</p>
+            </div>
+          </div>
+          ${m.groups.filter(g => g.opt).map(g => groupHTML(g)).join("")}
+        </div>
+      ` : ""}
+    </div>
+  `).join("");
+
+  host.querySelectorAll(".module").forEach(modEl => {
+    const mod = MODULES.find(x => x.id === modEl.dataset.mod);
+
+    modEl.querySelectorAll(".group").forEach(gEl => {
+      const gid = gEl.dataset.g;
+      const g = mod.groups.find(x => x.id === gid);
+      gEl.querySelectorAll(".chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          const v = chip.dataset.v;
+          if(g.type === "single"){
+            state[gid] = state[gid][0] === v ? [] : [v];
+          }else{
+            const i = state[gid].indexOf(v);
+            if(i >= 0) state[gid].splice(i,1); else state[gid].push(v);
+          }
+          syncChips(gid, gEl);
+          generate();
+        });
+      });
+    });
+
+    const pname = modEl.querySelector(".pname");
+    const plist = modEl.querySelector(".p-list");
+
+    const refreshList = (sel) => {
+      const names = Object.keys(presets[mod.id] || {});
+      plist.innerHTML = names.length
+        ? `<option value="">— 选择预设 —</option>` + names.map(n => `<option value="${n}">${n}</option>`).join("")
+        : `<option value="">— 暂无预设 —</option>`;
+      if(sel && names.includes(sel)) plist.value = sel;
+    };
+
+    modEl.querySelector(".p-save").addEventListener("click", () => {
+      const name = (pname.value || "").trim();
+      if(!name){ toast("请先填写预设名称"); pname.focus(); return; }
+      presets[mod.id] = presets[mod.id] || {};
+      const snap = {};
+      mod.groups.forEach(g => snap[g.id] = state[g.id].slice());
+      presets[mod.id][name] = snap;
+      savePresets(); refreshList(name);
+      toast("已保存预设：" + name);
+    });
+
+    modEl.querySelector(".p-load").addEventListener("click", () => {
+      const name = plist.value;
+      if(!name){ toast("请先选择一个预设"); return; }
+      const snap = (presets[mod.id] || {})[name];
+      if(!snap){ toast("预设不存在"); return; }
+      mod.groups.forEach(g => { state[g.id] = (snap[g.id] || []).slice(); });
+      modEl.querySelectorAll(".group").forEach(gEl => syncChips(gEl.dataset.g, gEl));
+      generate();
+      toast("已加载预设：" + name);
+    });
+
+    modEl.querySelector(".p-del").addEventListener("click", () => {
+      const name = plist.value;
+      if(!name){ toast("请先选择要删除的预设"); return; }
+      delete presets[mod.id][name];
+      savePresets(); refreshList();
+      toast("已删除预设：" + name);
+    });
+
+    refreshList();
+
+    // 恢复/初始化选中态
+    modEl.querySelectorAll(".group").forEach(gEl => syncChips(gEl.dataset.g, gEl));
+  });
+}
+
+function syncChips(gid, gEl){
+  const vals = state[gid] || [];
+  gEl.querySelectorAll(".chip").forEach(c => {
+    c.classList.toggle("on", vals.includes(c.dataset.v));
+  });
+}
+
+/* =========================================================
+   关键词云
+   ========================================================= */
+function renderKeywords(){
+  const host = document.getElementById("keywords");
+  host.innerHTML = KEYWORD_GROUPS.map(g => `
+    <div class="kwgroup">
+      <div class="k">${g.k}</div>
+      <div class="kw">
+        ${g.words.map(w => `<span class="w" data-w="${w}">${w}</span>`).join("")}
+      </div>
+    </div>
+  `).join("");
+  host.querySelectorAll(".w").forEach(el => {
+    el.addEventListener("click", () => {
+      const w = el.dataset.w;
+      const i = kwState.indexOf(w);
+      if(i >= 0) kwState.splice(i,1); else kwState.push(w);
+      el.classList.toggle("on", kwState.includes(w));
+      generate();
+    });
+  });
+}
+
+/* =========================================================
+   生成指令
+   ========================================================= */
+function get(gid){
+  const a = state[gid] || [];
+  return a.length ? a.join("、") : "";
+}
+
+function buildOne(action){
+  const parts = [];
+
+  const fit = get("fit"), color = get("color"), fabric = get("fabric");
+  const detail = get("detail"), top = get("top"), shoe = get("shoe");
+  const scene = get("scene"), mood = get("mood"), frame = get("frame");
+  const tone = get("tone"), light = get("light"), lens = get("lens");
+  const bg = get("bg"), view = get("view"), ratio = get("ratio");
+  const quality = get("quality"), label = get("label");
+
+  // 主体与款式
+  const form = get("form") || "真人动作主图（默认）";
+  const isStill = form !== "真人动作主图（默认）";
+  let sub = isStill
+    ? "将我提供的这条长裤（参考图）按照以下指令，生成一张商业服装静物图。"
+    : "将我提供的这条长裤（参考图）按照以下指令，生成一张商业服装摄影。";
+  let looks = [];
+  if(top) looks.push(top);
+  let trouser = [];
+  if(color) trouser.push(color);
+  if(fit) trouser.push(fit);
+  if(trouser.length) looks.push(trouser.join(""));
+  if(fabric) looks.push(fabric);
+  if(looks.length) sub += (isStill ? "陈列时参考搭配：" : "穿搭：") + looks.join("，") + "。";
+
+  // 款式留空 → 严格保留产品图
+  const fitEmpty = !fit && !color && !fabric && !detail;
+  if(fitEmpty){
+    sub += isStill
+      ? "长裤版型、颜色、面料纹理与光泽、腰部结构（腰头/门襟/腰襻）、口袋位置与造型、裤线与裤脚处理，全部严格按参考产品图 1:1 保留，不改款式、不改配色、不改变做旧与褶皱特征，只重新陈列并调整背景与光线。"
+      : "长裤版型、颜色、面料纹理与光泽、腰部结构（腰头/门襟/腰襻）、口袋位置与造型、裤线与裤脚处理，全部严格按参考产品图 1:1 保留，不改款式、不改配色、不改变做旧与褶皱特征，只更换模特、场景与拍摄表现。";
+  }else{
+    if(detail) sub += "裤装细节：" + detail + "。";
+    sub += "长裤主体仍以参考图为准，仅在上述已选参数范围内做调整，其余款式结构保持不变。";
+  }
+  if(shoe) sub += (isStill ? "可搭配：" : "鞋履与配件：") + shoe + "。";
+  parts.push(sub);
+
+  // 静物形态描述
+  if(isStill){
+    const stillMap = {
+      "静物平铺":"静物平铺展示：长裤完整平铺于台面，正面略斜放置，裤身自然舒展、不堆叠遮挡，两侧对称可读出版型轮廓。",
+      "挂拍 / 衣架悬挂":"挂拍展示：长裤用简洁衣架竖直悬挂，裤身自然垂落，垂坠感与裤线笔直可见。",
+      "半身模台 / 假人展示":"半身模台展示：长裤穿于下半身模台上，正面站立姿态呈现腰头到裤脚的完整版型。",
+      "多色叠放陈列":"多色陈列：同款长裤以 2-4 个颜色并排或上下叠放排列，腰头齐平露出，用排列讲清可选色与洗水差异。"
+    };
+    parts.push(stillMap[form] || "");
+  }
+
+  // 动作情绪
+  let act = [];
+  if(!isStill){
+    if(action) act.push("动作：" + action);
+    if(mood) act.push("情绪：" + mood);
+  }
+  if(act.length) parts.push(act.join("；") + "。");
+
+  // 场景
+  let sc = [];
+  if(scene && !isStill) sc.push("场景：" + scene);
+  if(bg) sc.push(isStill ? "背景：" + bg : bg);
+  if(sc.length) parts.push(sc.join("；") + "。");
+
+  // 视觉语言
+  let vis = [];
+  if(tone) vis.push("视觉基调 " + tone);
+  if(light) vis.push("光影 " + light);
+  if(lens && !isStill) vis.push("镜头 " + lens);
+  if(view && !isStill) vis.push("机位 " + view);
+  if(frame && !isStill) vis.push("构图 " + frame + "，人物居中，裤装占画面 60% 以上");
+  if(vis.length) parts.push(vis.join("；") + "。");
+
+  // 硬性构图约束
+  if(isStill){
+    parts.push("单张整幅静物构图，单品为唯一主体，满幅拍摄；腰头、口袋、裤线与裤脚完整入镜且不被遮挡，不做左右分栏、不做细节展示框、不做编号角标、不拼图分格。");
+  }else{
+    parts.push("单张整幅构图，一位模特、一个动作、一个场景，满幅拍摄；腰头、口袋、裤线与裤脚完整入镜，不做左右分栏、不做细节展示框、不做编号角标、不拼图分格。");
+  }
+
+  // 输出规格
+  let out = [];
+  if(ratio) out.push("画面比例 " + ratio);
+  if(quality) out.push("画质 " + quality);
+  parts.push(out.length ? out.join("，") + "。" : "");
+
+  // 标注
+  if(label === "不标注、纯主图" || !label){
+    parts.push("画面不加任何文字与图标，纯主图。");
+  }else if(label === "右下角小字标注面料卖点"){
+    parts.push("仅在右下角放一行小字标注面料卖点（不超过 8 字，字号小、低调不压产品），不添加其它文字或图标。");
+  }else if(label === "极简 ICON 标注版型卖点"){
+    parts.push("仅在画面边缘用一个极简线性 ICON 标注版型卖点（如垂坠、免烫），不加文字标题、不加色块。");
+  }
+
+  // 补充关键词
+  if(kwState.length) parts.push("补充关键词：" + kwState.join("、") + "。");
+
+  // 负面
+  let negExtra = fitEmpty ? "、改动长裤版型、改变裤子颜色、更换面料纹理、缩短或加长裤脚" : "";
+  if(isStill) negExtra += "、模特出镜、人体穿搭、悬空漂浮、裤身褶皱堆叠、单品之外的道具抢镜";
+  parts.push("避免：" + NEGATIVE + negExtra + "。");
+
+  return parts.filter(Boolean).join("\n");
+}
+
+function generate(){
+  const form = get("form") || "真人动作主图（默认）";
+  const isStillNow = form !== "真人动作主图（默认）";
+  const actions = (!isStillNow && state["action"] && state["action"].length) ? state["action"] : [""];
+  const lines = actions.map((a, i) => {
+    const body = buildOne(a);
+    if(actions.length === 1) return body;
+    return `指令 ${i+1}　｜　动作：${a}\n` + body;
+  });
+
+  const box = document.getElementById("promptBox");
+  if(!Object.values(state).some(v => v.length) && !kwState.length){
+    box.innerHTML = `<span class="ph">在左侧选择款式、场景、动作与视觉语言，指令将自动生成…</span>`;
+    document.getElementById("charCount").textContent = "0 字";
+    renderTagline([]);
+    return;
+  }
+
+  box.textContent = lines.join("\n\n──────────────\n\n");
+  const total = lines.join("").replace(/\s/g,"").length;
+  document.getElementById("charCount").textContent = total + " 字 · " + lines.length + " 张图";
+
+  // 已选标签
+  const tags = [];
+  MODULES.forEach(m => m.groups.forEach(g => {
+    (state[g.id] || []).forEach(v => tags.push({ k: g.label.replace("（多选＝多张图）","").replace("（多选）",""), v }));
+  }));
+  kwState.forEach(w => tags.push({ k:"补充", v:w }));
+  renderTagline(tags);
+}
+
+function renderTagline(tags){
+  const host = document.getElementById("tagline");
+  if(!tags.length){ host.innerHTML = ""; return; }
+  host.innerHTML = tags.map(t => `<span class="t">${t.k}：${t.v}</span>`).join("");
+}
+
+/* =========================================================
+   复制 / 重置 / toast
+   ========================================================= */
+document.getElementById("copyBtn").addEventListener("click", async () => {
+  const text = document.getElementById("promptBox").innerText.trim();
+  if(!text || text.indexOf("在左侧选择") === 0){ toast("还没有可复制的指令"); return; }
+  try{
+    await navigator.clipboard.writeText(text);
+    toast("已复制全部指令");
+  }catch(e){
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand("copy"); toast("已复制全部指令"); }
+    catch(err){ toast("复制失败，请手动选中复制"); }
+    document.body.removeChild(ta);
+  }
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  MODULES.forEach(m => m.groups.forEach(g => { state[g.id] = []; }));
+  state["ratio"] = ["3:4 竖版（主投）"];
+  state["quality"] = ["电商主图级、清晰干净"];
+  state["label"] = ["不标注、纯主图"];
+  state["form"] = ["真人动作主图（默认）"];
+  kwState = [];
+  document.querySelectorAll(".chip.on").forEach(c => c.classList.remove("on"));
+  document.querySelectorAll(".kw .w.on").forEach(c => c.classList.remove("on"));
+  MODULES.forEach(m => m.groups.forEach(g => {
+    if(state[g.id].length){
+      const el = document.querySelector('.group[data-g="' + g.id + '"]');
+      if(el) syncChips(g.id, el);
+    }
+  }));
+  generate();
+  toast("已重置当前选择（预设保留）");
+});
+
+let toastTimer = null;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+/* =========================================================
+   初始化
+   ========================================================= */
+renderRecipes();
+renderModules();
+renderKeywords();
+generate();
+</script>
+</body>
+</html>
