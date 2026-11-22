@@ -314,6 +314,14 @@
   }
   .disclaimer p{margin:0}
   .disclaimer .dk{color:#b0b0b8;font-size:11.5px;letter-spacing:2px;margin-bottom:6px}
+  .disc-list{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);text-align:left;display:grid;gap:10px}
+  .disc-row{display:grid;grid-template-columns:88px 1fr;gap:12px;font-size:12.4px;line-height:1.95;color:#8a8a93}
+  .disc-row b{color:var(--ink-2);font-weight:600;letter-spacing:.5px}
+  @media(max-width:640px){
+    .disc-row{grid-template-columns:1fr;gap:2px}
+    .disc-row b{font-size:12.2px}
+  }
+
 
   /* 标准表 */
   .stdtable{width:100%;border-collapse:collapse;font-size:12.3px}
@@ -1096,6 +1104,12 @@
     <div class="dk">免 责 声 明</div>
     <p>【本文分享的内容（包括但不限于示例、图片、文字等）仅供参考，不构成任何法律意见或建议】</p>
     <p>【跨境电商是长期生意，希望和商家一起通过良性的经营，打造好的购物体验，更好地服务用户】</p>
+    <div class="disc-list">
+      <div class="disc-row"><b>使用范围</b><span>本资料为个人经验分享，仅供内部学习与参考，严禁外传。</span></div>
+      <div class="disc-row"><b>知识产权</b><span>文中涉及的所有商品设计、外观、功能、品牌 Logo 及图案等，其知识产权均归原合法权利人所有，此处仅作行业热款与趋势分析参考，请安全开发款式。</span></div>
+      <div class="disc-row"><b>侵权提示</b><span>请勿直接套用、抄袭相关设计或未经授权使用他人 Logo。如需使用，请自行联系权利人获取授权。若因侵权引发法律纠纷，责任由使用者自行承担。</span></div>
+      <div class="disc-row"><b>免责条款</b><span>本资料仅供方向性参考，编者不对因使用本资料内容所产生的任何后果承担法律责任。</span></div>
+    </div>
   </div>
 
 </div>
